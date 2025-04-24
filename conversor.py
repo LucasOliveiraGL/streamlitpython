@@ -11,7 +11,7 @@ CAMINHO_JSON_LOCAL = Path("embalagens.json")
 NOME_ARQUIVO_DRIVE = "embalagens.json"
 LINK_COMPARTILHAMENTO = "https://drive.google.com/file/d/1rMDq1rv-K-ON2CJ9pmv3QNlUPsqdCq47/view?usp=drive_link"
 
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+SCOPES = ['https://www.googleapis.com/auth/drive']
 
 # Conectar ao Google Drive usando secrets do Streamlit
 def conectar_drive():
