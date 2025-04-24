@@ -20,8 +20,15 @@ def conectar_drive():
     return service
 
 def buscar_arquivo(service, nome_arquivo):
-    query = f"name='{nome_arquivo}' and '{PASTA_ID}' in parents"
+    query = f"name='{nome_arquivo}' and '{PASTA_ID}' in parents and trashed = false"
     results = service.files().list(q=query, spaces='drive', fields="files(id, name)").execute()
+    
+    st.write("🔎 Resultado da busca:", results)  # Mantenha o log
+    
+    items = results.get('files', [])
+    if items:
+        return items[0]['id']
+    return None
     
     # 🔹 Log de Debug
     st.write("Resultado da busca no Drive:", results)
