@@ -21,8 +21,10 @@ def conectar_drive():
     return service
 
 # Buscar ID do arquivo no Drive
+PASTA_ID = "1CMC0MQYLK1tmKvUEElLj_NRRt-1igMSj"
+
 def buscar_arquivo(service, nome_arquivo):
-    query = f"name='{nome_arquivo}'"
+    query = f"name='{nome_arquivo}' and '{PASTA_ID}' in parents"
     results = service.files().list(q=query, spaces='drive', fields="files(id, name)").execute()
     items = results.get('files', [])
     if items:
