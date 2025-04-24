@@ -11,8 +11,6 @@ CAMINHO_JSON_LOCAL = Path("embalagens.json")
 NOME_ARQUIVO_DRIVE = "embalagens.json"
 LINK_COMPARTILHAMENTO = "https://drive.google.com/file/d/1rMDq1rv-K-ON2CJ9pmv3QNlUPsqdCq47/view?usp=drive_link"
 
-SCOPES = ['https://www.googleapis.com/auth/drive']
-
 # Conectar ao Google Drive usando secrets do Streamlit
 def conectar_drive():
     service_account_info = st.secrets["gdrive"]
@@ -21,6 +19,7 @@ def conectar_drive():
     return service
 
 # Buscar ID do arquivo no Drive
+SCOPES = ['https://www.googleapis.com/auth/drive']
 PASTA_ID = "1CMC0MQYLK1tmKvUEElLj_NRRt-1igMSj"
 
 def buscar_arquivo(service, nome_arquivo):
@@ -30,7 +29,6 @@ def buscar_arquivo(service, nome_arquivo):
     if items:
         return items[0]['id']
     return None
-
 # Baixar JSON do Drive
 def baixar_json(service, file_id, destino_local):
     request = service.files().get_media(fileId=file_id)
