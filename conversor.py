@@ -51,7 +51,7 @@ service = conectar_drive()
 file_id = buscar_arquivo(service, NOME_ARQUIVO_DRIVE)
 
 if file_id:
-    baixar_json(service, file_id, CAMINHO_JSON_LOCAL)
+    baixar_json(service, file_id, LINK_COMPARTILHAMENTO)
 else:
     st.error("Arquivo embalagens.json não encontrado no Google Drive.")
     st.markdown(f"🔗 [Clique aqui para acessar o arquivo manualmente]({LINK_COMPARTILHAMENTO})")
