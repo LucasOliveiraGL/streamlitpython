@@ -144,37 +144,34 @@ if pagina == "Conversão de Quantidades":
     qtd_informada = st.number_input("Quantidade", min_value=1, step=1)
 
     if st.button("Converter"):
-        produto = cod_to_produto.get(codigo_origem)
-        if not produto:
-            st.error("Código não encontrado.")
-            st.stop()
+     produto = cod_to_produto.get(codigo_origem)
+    if not produto:
+        st.error("Código não encontrado.")
+        st.stop()
 
-        cod_cx = produto["cod_caixa"]
-        cod_dp = produto["cod_display"]
-        cod_un = produto["cod_unitario"]
-        qtd_dp_por_cx = produto["qtd_displays_caixa"]
-        qtd_un_por_dp = produto["qtd_unidades_display"]
-
-        un_por_cx = qtd_dp_por_cx * qtd_un_por_dp
-        un_por_dp = qtd_un_por_dp
+    cod_cx = produto["cod_caixa"]
+    cod_dp = produto["cod_display"]
+    cod_un = produto["cod_unitario"]
+    qtd_dp_por_cx = produto["qtd_displays_caixa"]
+    qtd_un_por_dp = produto["qtd_unidades_display"]
 
     if codigo_origem == cod_cx:
-       qtd_caixa = qtd_informada
-       qtd_display = qtd_caixa * qtd_dp_por_cx
-       sobra_un = qtd_display * qtd_un_por_dp
+        qtd_caixa = qtd_informada
+        qtd_display = qtd_caixa * qtd_dp_por_cx
+        sobra_un = qtd_display * qtd_un_por_dp
     elif codigo_origem == cod_dp:
-       qtd_caixa = 0
-       qtd_display = qtd_informada
-       sobra_un = qtd_display * qtd_un_por_dp
+        qtd_caixa = 0
+        qtd_display = qtd_informada
+        sobra_un = qtd_display * qtd_un_por_dp
     elif codigo_origem == cod_un:
-       qtd_caixa = 0
-       qtd_display = 0
-       sobra_un = qtd_informada
+        qtd_caixa = 0
+        qtd_display = 0
+        sobra_un = qtd_informada
     else:
-     st.error("Código inválido.")
-     st.stop()
+        st.error("Código inválido.")
+        st.stop()
 
-st.success(f"🔹 Conversão de {qtd_informada}x ({codigo_origem}) → {produto['produto']}")
-st.markdown(f"- 📦 **Caixas** ({cod_cx}): `{int(qtd_caixa)}`")
-st.markdown(f"- 📦 **Displays** ({cod_dp}): `{int(qtd_display)}`")
-st.markdown(f"- 🧃 **Unidades** ({cod_un}): `{int(sobra_un)}`")
+    st.success(f"🔹 Conversão de {qtd_informada}x ({codigo_origem}) → {produto['produto']}")
+    st.markdown(f"- 📦 **Caixas** ({cod_cx}): `{int(qtd_caixa)}`")
+    st.markdown(f"- 📦 **Displays** ({cod_dp}): `{int(qtd_display)}`")
+    st.markdown(f"- 🧃 **Unidades** ({cod_un}): `{int(sobra_un)}`")
