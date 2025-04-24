@@ -9,27 +9,28 @@ from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 
 CAMINHO_JSON_LOCAL = Path("embalagens.json")
 NOME_ARQUIVO_DRIVE = "embalagens.json"
-LINK_COMPARTILHAMENTO = "https://drive.google.com/file/d/1rMDq1rv-K-ON2CJ9pmv3QNlUPsqdCq47/view?usp=drive_link"
+PASTA_ID = "1CMC0MQYLK1tmKvUEElLj_NRRt-1igMSj"
 
-# Conectar ao Google Drive usando secrets do Streamlit
+SCOPES = ['https://www.googleapis.com/auth/drive']
+
 def conectar_drive():
     service_account_info = st.secrets["gdrive"]
     creds = service_account.Credentials.from_service_account_info(service_account_info, scopes=SCOPES)
     service = build('drive', 'v3', credentials=creds)
     return service
 
-# Buscar ID do arquivo no Drive
-SCOPES = ['https://www.googleapis.com/auth/drive']
-PASTA_ID = "1CMC0MQYLK1tmKvUEElLj_NRRt-1igMSj"
-
 def buscar_arquivo(service, nome_arquivo):
     query = f"name='{nome_arquivo}' and '{PASTA_ID}' in parents"
     results = service.files().list(q=query, spaces='drive', fields="files(id, name)").execute()
+    
+    # 🔹 Log de Debug
+    st.write("Resultado da busca no Drive:", results)
+    
     items = results.get('files', [])
     if items:
         return items[0]['id']
     return None
-# Baixar JSON do Drive
+
 def baixar_json(service, file_id, destino_local):
     request = service.files().get_media(fileId=file_id)
     fh = io.FileIO(destino_local, 'wb')
@@ -38,13 +39,11 @@ def baixar_json(service, file_id, destino_local):
     while not done:
         status, done = downloader.next_chunk()
 
-# Atualizar JSON no Drive
 def atualizar_json(service, file_id, local_path):
     media = MediaFileUpload(local_path, mimetype='application/json')
     service.files().update(fileId=file_id, media_body=media).execute()
 
 # ====== INÍCIO DO APP ======
-
 st.set_page_config(page_title="Conversor de Embalagens", layout="wide")
 
 service = conectar_drive()
@@ -54,9 +53,10 @@ if file_id:
     baixar_json(service, file_id, CAMINHO_JSON_LOCAL)
 else:
     st.error("Arquivo embalagens.json não encontrado no Google Drive.")
-    st.markdown(f"🔗 [Clique aqui para acessar o arquivo manualmente]({LINK_COMPARTILHAMENTO})")
+    st.markdown("[🔗 Clique aqui para acessar o arquivo manualmente](https://drive.google.com/drive/folders/1CMC0MQYLK1tmKvUEElLj_NRRt-1igMSj)")
     st.stop()
 
+# --- Resto do código permanece igual ---
 def carregar_dados():
     if CAMINHO_JSON_LOCAL.exists():
         with open(CAMINHO_JSON_LOCAL, "r", encoding="utf-8") as f:
