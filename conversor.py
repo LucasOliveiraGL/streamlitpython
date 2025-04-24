@@ -9,6 +9,7 @@ from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 
 CAMINHO_JSON_LOCAL = Path("embalagens.json")
 NOME_ARQUIVO_DRIVE = "embalagens.json"
+LINK_COMPARTILHAMENTO = "https://drive.google.com/file/d/1rMDq1rv-K-ON2CJ9pmv3QNlUPsqdCq47/view?usp=drive_link"
 
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
 
@@ -53,6 +54,7 @@ if file_id:
     baixar_json(service, file_id, CAMINHO_JSON_LOCAL)
 else:
     st.error("Arquivo embalagens.json não encontrado no Google Drive.")
+    st.markdown(f"🔗 [Clique aqui para acessar o arquivo manualmente]({LINK_COMPARTILHAMENTO})")
     st.stop()
 
 def carregar_dados():
