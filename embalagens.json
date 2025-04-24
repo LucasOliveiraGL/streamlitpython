@@ -1,0 +1,18 @@
+[
+    {
+        "produto": "Cups Amendoim",
+        "cod_caixa": "PA-CP41001",
+        "qtd_displays_caixa": 4,
+        "cod_display": "PA-CP1001",
+        "qtd_unidades_display": 10,
+        "cod_unitario": "PA-CP01"
+    },
+    {
+        "produto": "Cups Brigadeiro",
+        "cod_caixa": "PA-CP41002",
+        "qtd_displays_caixa": 4,
+        "cod_display": "PA-CP1002",
+        "qtd_unidades_display": 10,
+        "cod_unitario": "PA-CP02"
+    }
+]
