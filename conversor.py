@@ -158,23 +158,23 @@ if pagina == "Conversão de Quantidades":
         un_por_cx = qtd_dp_por_cx * qtd_un_por_dp
         un_por_dp = qtd_un_por_dp
 
-        if codigo_origem == cod_cx:
-            total_un = qtd_informada * un_por_cx
-        elif codigo_origem == cod_dp:
-            total_un = qtd_informada * un_por_dp
-        elif codigo_origem == cod_un:
-            total_un = qtd_informada
-        else:
-            st.error("Código inválido.")
-            st.stop()
+       if codigo_origem == cod_cx:
+    qtd_caixa = qtd_informada
+    qtd_display = qtd_caixa * qtd_dp_por_cx
+    sobra_un = qtd_display * qtd_un_por_dp
+elif codigo_origem == cod_dp:
+    qtd_caixa = 0
+    qtd_display = qtd_informada
+    sobra_un = qtd_display * qtd_un_por_dp
+elif codigo_origem == cod_un:
+    qtd_caixa = 0
+    qtd_display = 0
+    sobra_un = qtd_informada
+else:
+    st.error("Código inválido.")
+    st.stop()
 
-        qtd_caixa = total_un // un_por_cx
-        restante = total_un % un_por_cx
-
-        qtd_display = restante // un_por_dp
-        sobra_un = restante % un_por_dp
-
-        st.success(f"🔹 Conversão de {qtd_informada}x ({codigo_origem}) → {produto['produto']}")
-        st.markdown(f"- 📦 **Caixas** ({cod_cx}): `{int(qtd_caixa)}`")
-        st.markdown(f"- 📦 **Displays** ({cod_dp}): `{int(qtd_display)}`")
-        st.markdown(f"- 🧃 **Unidades** ({cod_un}): `{int(sobra_un)}`")
+st.success(f"🔹 Conversão de {qtd_informada}x ({codigo_origem}) → {produto['produto']}")
+st.markdown(f"- 📦 **Caixas** ({cod_cx}): `{int(qtd_caixa)}`")
+st.markdown(f"- 📦 **Displays** ({cod_dp}): `{int(qtd_display)}`")
+st.markdown(f"- 🧃 **Unidades** ({cod_un}): `{int(sobra_un)}`")
