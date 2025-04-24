@@ -2,74 +2,41 @@ import streamlit as st
 import json
 from pathlib import Path
 import pandas as pd
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-import io
-from googleapiclient.http import MediaIoBaseDownload, MediaFileUpload
 
-CAMINHO_JSON_LOCAL = Path("embalagens.json")
-NOME_ARQUIVO_DRIVE = "embalagens.json"
-
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
-
-# Conectar ao Google Drive
-def conectar_drive():
-    creds = service_account.Credentials.from_service_account_file('credentials.json', scopes=SCOPES)
-    service = build('drive', 'v3', credentials=creds)
-    return service
-
-# Buscar ID do arquivo no Drive
-def buscar_arquivo(service, nome_arquivo):
-    query = f"name='{nome_arquivo}'"
-    results = service.files().list(q=query, spaces='drive', fields="files(id, name)").execute()
-    items = results.get('files', [])
-    if items:
-        return items[0]['id']
-    return None
-
-# Baixar JSON do Drive
-def baixar_json(service, file_id, destino_local):
-    request = service.files().get_media(fileId=file_id)
-    fh = io.FileIO(destino_local, 'wb')
-    downloader = MediaIoBaseDownload(fh, request)
-    done = False
-    while not done:
-        status, done = downloader.next_chunk()
-
-# Atualizar JSON no Drive
-def atualizar_json(service, file_id, local_path):
-    media = MediaFileUpload(local_path, mimetype='application/json')
-    service.files().update(fileId=file_id, media_body=media).execute()
-
-# ====== INÍCIO DO APP ======
-
-st.set_page_config(page_title="Conversor de Embalagens", layout="wide")
-
-service = conectar_drive()
-file_id = buscar_arquivo(service, NOME_ARQUIVO_DRIVE)
-
-if file_id:
-    baixar_json(service, file_id, CAMINHO_JSON_LOCAL)
-else:
-    st.error("Arquivo embalagens.json não encontrado no Google Drive.")
-    st.stop()
+CAMINHO_JSON = Path("embalagens.json")
 
 def carregar_dados():
-    if CAMINHO_JSON_LOCAL.exists():
-        with open(CAMINHO_JSON_LOCAL, "r", encoding="utf-8") as f:
+    if CAMINHO_JSON.exists():
+        with open(CAMINHO_JSON, "r", encoding="utf-8") as f:
             return json.load(f)
     return []
 
 def salvar_dados(lista):
-    with open(CAMINHO_JSON_LOCAL, "w", encoding="utf-8") as f:
+    with open(CAMINHO_JSON, "w", encoding="utf-8") as f:
         json.dump(lista, f, indent=4, ensure_ascii=False)
-    atualizar_json(service, file_id, CAMINHO_JSON_LOCAL)
+
+st.set_page_config(page_title="Conversor de Embalagens", layout="wide")
 
 pagina = st.sidebar.selectbox("📂 Menu", ["Cadastro de Produto", "Conversão de Quantidades"])
 dados = carregar_dados()
 
 if pagina == "Cadastro de Produto":
     st.title("📦 Cadastro de Produto (Caixa > Display > Unidade)")
+
+    col_exp, col_imp = st.columns(2)
+    with col_exp:
+        st.download_button("📤 Exportar Cadastro", data=json.dumps(dados, indent=4), file_name="cadastro_embalagens.json", mime="application/json")
+    with col_imp:
+        arquivo = st.file_uploader("📥 Importar Cadastro", type=["json"])
+        if arquivo is not None:
+            dados_importados = json.load(arquivo)
+            if st.checkbox("Sobrescrever cadastro atual"):
+                dados = dados_importados
+            else:
+                dados.extend(dados_importados)
+            salvar_dados(dados)
+            st.success("Cadastro importado com sucesso!")
+            st.rerun()
 
     with st.form("cadastro_produto"):
         st.subheader("➕ Cadastrar Novo Produto")
@@ -166,13 +133,10 @@ if pagina == "Conversão de Quantidades":
             st.error("Código inválido.")
             st.stop()
 
-        qtd_caixa = total_un // un_por_cx
-        restante = total_un % un_por_cx
-
-        qtd_display = restante // un_por_dp
-        sobra_un = restante % un_por_dp
+        total_display = total_un // un_por_dp
+        total_caixa = total_un // un_por_cx
 
         st.success(f"🔹 Conversão de {qtd_informada}x ({codigo_origem}) → {produto['produto']}")
-        st.markdown(f"- 📦 **Caixas** ({cod_cx}): `{int(qtd_caixa)}`")
-        st.markdown(f"- 📦 **Displays** ({cod_dp}): `{int(qtd_display)}`")
-        st.markdown(f"- 🧃 **Unidades** ({cod_un}): `{int(sobra_un)}`")
+        st.markdown(f"- 📦 **Caixas** ({cod_cx}): `{int(total_caixa)}`")
+        st.markdown(f"- 📦 **Displays** ({cod_dp}): `{int(total_display)}`")
+        st.markdown(f"- 🧃 **Unidades** ({cod_un}): `{int(total_un)}`")
